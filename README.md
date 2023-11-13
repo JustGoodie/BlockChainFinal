@@ -1,4 +1,4 @@
-![image_2023-11-13_21-01-46](https://github.com/JustGoodie/BlockChainFinal/assets/92390698/b65cafaf-cbb6-4f31-a1ee-f2624b562f7b)# Lottery game using GoerliETH Blockchain
+# Lottery game using GoerliETH Blockchain
 
 ### This project demonstrates a Lottery game launched on web hosting. The logic of the application is compiled using the smart contract. The smart contract was deployed using hardhat.
 
