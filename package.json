@@ -1,0 +1,22 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --timeout 20000"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.4",
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.0",
+    "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers@^0.4.1",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@types/mocha": "^9.1.1",
+    "ethers": "^6.8.1",
+    "hardhat": "^2.19.0"
+  }
+}

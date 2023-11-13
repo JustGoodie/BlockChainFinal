@@ -1,0 +1,40 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "C:\\Users\\Captain\\Documents\\Important_docs\\Course7\\Blockchain_Practices\\Final\\contracts\\Final.sol": {
+      "lastModificationDate": 1699812076432,
+      "contentHash": "b69f526e2ab76b95122a07f0002f82db",
+      "sourceName": "contracts/Final.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "Final"
+      ]
+    }
+  }
+}

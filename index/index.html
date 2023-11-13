@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+        <title>Lottery</title>
+    </head>
+    <body>
+        <nav class="navbar navbar-dark bg-dark navbar-expand-lg">
+			<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+			  	<div class="navbar-nav">
+					<a class="nav-item nav-link active" href="/">Lottery</a>
+					<a class="nav-item nav-link" href="/history">History</a>
+					<a class="nav-item nav-link" href="/rules">Rules</a>
+				</div>
+			</div>
+        </nav>
+        <br>
+        <div class="container text-center">
+            <div class="row">
+				<button onclick="connectMetamask()" type="button" class="btn btn-primary" id="connectButton">
+					<h3 id="connectText">Connect wallet to play</h3>
+				</button>
+            </div>
+            <br><br>
+            <div class="container" id = "lotteryBlock" style="display: none;">
+				<form onsubmit="return false">
+					<div class="row">
+						<div class="col">
+							<input id="input1" class="form-control" style="font-size:26px" type="number" min="1" max="99" maxlength="2" required>
+						</div>
+						<div class="col">
+							<input id="input2" class="form-control" style="font-size:26px" type="number" min="1" max="99" maxlength="2" oninput="InvalidMsg1();" required>
+						</div>
+						<div class="col">
+							<input id="input3" class="form-control" style="font-size:26px" type="number" min="1" max="99" maxlength="2" oninput="InvalidMsg2();" required>
+						</div>
+						<div class="col">
+							<input id="input4" class="form-control" style="font-size:26px" type="number" min="1" max="99" maxlength="2" oninput="InvalidMsg3();" required>
+						</div>
+						<div class="col">
+							<input id="input5" class="form-control" style="font-size:26px" type="number" min="1" max="99" maxlength="2" oninput="InvalidMsg4();" required>
+						</div>
+					</div>
+					<br>
+					<div class="row">
+						<button onclick="playLottery()" id="playButton" type="submit" class="btn btn-primary"><h3 id="playText">Play (0.01ETH)</h3></button>
+					</div>
+				</form>
+				<br>
+				<div id = "lotteryResults" style="display: none;">
+					<div class="row">
+						<h3 id="result"></h3>
+					</div>
+					<br>
+					<div class="row">
+						<h3 id="userValues"></h3>
+					</div>
+					<br>
+					<div class="row">
+						<h3 id="gameValues"></h3>
+					</div>
+					<br>
+					<div class="row">
+						<button onclick="gamesHistory()" type="button" class="btn btn-primary"><h3>Games history</h3></button>
+					</div>
+					<br>
+					<div class="row">
+						<button onclick="reloadPage()" type="button" class="btn btn-primary"><h3>Reload page</h3></button>
+					</div>
+				</div>
+            </div>
+            <br>
+        </div>
+        <script>
+            let account;
+			let allDiffer1 = false;
+			let allDiffer2 = false;
+			let allDiffer3 = false;
+			let allDiffer4 = false;
+
+            const connectMetamask = async () => {
+                if(window.ethereum !== "undefined"){
+                    const accounts = await ethereum.request({method: "eth_requestAccounts"});
+                    account = accounts[0];
+                    document.getElementById("connectButton").style.backgroundColor = "limegreen";
+                    document.getElementById("connectButton").style.borderColor = "limegreen";
+                    document.getElementById("connectText").innerText = "Wallet connected successfully";
+					const ABI = [
+		{
+			"inputs": [],
+			"stateMutability": "nonpayable",
+			"type": "constructor"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"name": "betIdsByAddress",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"name": "betInfo",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "betId",
+					"type": "uint256"
+				},
+				{
+					"internalType": "address",
+					"name": "walletAddress",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "gameResult",
+					"type": "uint256"
+				},
+				{
+					"internalType": "bool",
+					"name": "payed",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "betPrice",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_betterAddress",
+					"type": "address"
+				}
+			],
+			"name": "checkAddress",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "currentBetId",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"name": "gameValues",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "getRandomNumber",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_betterAddress",
+					"type": "address"
+				}
+			],
+			"name": "getReward",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_betterAddress",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "userValue1",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "userValue2",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "userValue3",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "userValue4",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "userValue5",
+					"type": "uint256"
+				}
+			],
+			"name": "makeBet",
+			"outputs": [],
+			"stateMutability": "payable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "userValue1",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "userValue2",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "userValue3",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "userValue4",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "userValue5",
+					"type": "uint256"
+				}
+			],
+			"name": "playGame",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256[5]",
+					"name": "",
+					"type": "uint256[5]"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"name": "userValues",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		}
+	]
+					;
+					const Address = "0x3DF7E853BcdA40BA0CAD831007D12e679b5bE6Dd";
+					window.web3 = await new Web3(window.ethereum);
+					window.contract = await new window.web3.eth.Contract(ABI, Address);
+					document.getElementById("lotteryBlock").style.display = "block";
+					document.getElementById("connectButton").disabled = true;
+                }
+            }
+			
+			function gamesHistory()	{
+				window.location.href = "/history";
+			}
+
+			function reloadPage() {
+				window.location.href = "/";
+			}
+
+			function InvalidMsg1() {
+				if (document.getElementById("input2").value == document.getElementById("input1").value){
+					document.getElementById("input2").setCustomValidity('All values should be different');
+					allDiffer1 = false;
+				} else {
+					document.getElementById("input2").setCustomValidity('');
+					allDiffer1 = true;
+				}
+				return true;
+			}
+
+			function InvalidMsg2() {
+				if (document.getElementById("input3").value == document.getElementById("input1").value
+				|| document.getElementById("input3").value == document.getElementById("input2").value
+				){
+					document.getElementById("input3").setCustomValidity('All values should be different');
+					allDiffer2 = false;
+				} else {
+					document.getElementById("input3").setCustomValidity('');
+					allDiffer2 = true;
+				}
+				return true;
+			}
+
+			function InvalidMsg3() {
+				if (document.getElementById("input4").value == document.getElementById("input1").value
+				|| document.getElementById("input4").value == document.getElementById("input2").value
+				|| document.getElementById("input4").value == document.getElementById("input3").value
+				){
+					document.getElementById("input4").setCustomValidity('All values should be different');
+					allDiffer3 = false;
+				} else {
+					document.getElementById("input4").setCustomValidity('');
+					allDiffer3 = true;
+				}
+				return true;
+			}
+
+			function InvalidMsg4() {
+				if (document.getElementById("input5").value == document.getElementById("input1").value
+				|| document.getElementById("input5").value == document.getElementById("input2").value
+				|| document.getElementById("input5").value == document.getElementById("input3").value
+				|| document.getElementById("input5").value == document.getElementById("input4").value
+				){
+					document.getElementById("input5").setCustomValidity('All values should be different');
+					allDiffer4 = false;
+				} else {
+					document.getElementById("input5").setCustomValidity('');
+					allDiffer4 = true;
+				}
+				return true;
+			}
+
+			const playLottery = async () => {
+				if (allDiffer1 && allDiffer2 && allDiffer3 && allDiffer4){
+					document.getElementById("playButton").style.backgroundColor = "DimGrey";
+					document.getElementById("playButton").style.borderColor = "DimGrey";
+					document.getElementById("playButton").disabled = true;
+					document.getElementById("playText").innerText = "Transaction in progress, please wait!";
+					const value1 = document.getElementById("input1").value;
+					const value2 = document.getElementById("input2").value;
+					const value3 = document.getElementById("input3").value;
+					const value4 = document.getElementById("input4").value;
+					const value5 = document.getElementById("input5").value;
+					await window.contract.methods.makeBet(account, value1, value2, value3, value4, value5).send({from : account, value : 10000000000000000});
+					document.getElementById("input1").value = '';
+					document.getElementById("input2").value = '';
+					document.getElementById("input3").value = '';
+					document.getElementById("input4").value = '';
+					document.getElementById("input5").value = '';
+					const betId = await window.contract.methods.checkAddress(account).call();
+					const info = window.contract.methods.betInfo(betId-1).call();
+					info.then(async function(result) {
+						document.getElementById("result").innerText = `You have ${result[2]} match(-es)`;
+					});
+					let gameValues = [];
+					for (let i = 0; i < 5; i++){
+						gameValues[i] = await window.contract.methods.gameValues((betId-1), i).call();
+					}
+					document.getElementById("playButton").style.backgroundColor = "limegreen";
+					document.getElementById("playButton").style.borderColor = "limegreen";
+					document.getElementById("playText").innerText = "Game played!";
+					document.getElementById("userValues").innerText = `Your values are: ${value1}, ${value2}, ${value3}, ${value4}, ${value5}`;
+					document.getElementById("gameValues").innerText = `Game values are: ${gameValues[0]}, ${gameValues[1]}, ${gameValues[2]}, ${gameValues[3]}, ${gameValues[4]}`;
+					document.getElementById("lotteryResults").style.display = "block";
+				}
+			}
+        </script>
+    </body>
+</html>
