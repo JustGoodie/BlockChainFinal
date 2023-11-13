@@ -4,6 +4,6 @@
 
 # Requirements
 
-⋅⋅* Metamask extension
-⋅⋅* Goerly Testnet connection
-⋅⋅* Holding GoerliETH on wallet
+* Metamask extension.
+* Goerly Testnet connection.
+* Holding GoerliETH on the wallet.
