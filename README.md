@@ -1,13 +1,5 @@
-# Sample Hardhat Project
+###Lottery game using GoerliETH Blockchain
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+This project demonstrates a Lottery game launched on web hosting. The logic of the application is compiled using the smart contract. The smart contract was deployed using hardhat.
 
-Try running some of the following tasks:
-
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
-```
+Features
